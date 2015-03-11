@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+		<div class="col-lg-12">
+			<!-- Header goes here -->
+			<h1 class="page-header">
+				{{ title }}
+            </h1>
+			<!-- Bread crumbs: use 'active' CSS class for current page -->
+            <ol class="breadcrumb">
+				<li>
+					<a href="/index">Home Page</a>
+                </li>
+                <li class="active">
+					{{ title }}
+                </li>
+            </ol>
+
+            {% if "sent" in session %}
+                <div class="alert alert-success alert-dismissable" onload="{{ session.pop("sent", None) }}">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <strong>Message sent!</strong>
+                </div>
+            {% endif %}
+
+            <a href="{{ url_for('sendMsg') }}" class="btn btn-sm btn-default">Send A Message »</a><br>
+            {% if messages|length < 1 %}
+                <p class="lead" style="margin-top: 10px;">
+                    You don't have any messages!
+                </p>
+            {% else %}
+                <table class="table table-bordered table-hover table-striped" style="margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>From</th>
+                            <th>Memo</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for msg in messages %}
+                        <tr>
+                            <td width="10%"><a href="{{ url_for('markMsgStatus', mid=msg['id']) }}" class="btn btn-sm btn-default">Mark Read/Unread</a></td>
+                            <td>{{ msg['from'] }}</td>
+                            <td width="50%">{{ msg['memo'] }}</td>
+                            <td>{{ moment(msg['time'], local=True).calendar() }}</td>
+                            <td>{% if msg['isRead'] == 0 %} unread {% else %} read {% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

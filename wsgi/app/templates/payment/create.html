@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+    {% macro inputField(form, placeholderText) %}
+        {% if form.errors|length > 0 %}
+            <div class="form-group has-error" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+                {{ form(class_="form-control", id_="inputError1", placeholder=placeholderText) }}
+            </div>
+        {% else %}
+			{{ form(class_="form-control", placeholder=placeholderText) }}
+        {% endif %}
+    {% endmacro %}
+
+    <div class="row">
+		<div class="col-lg-12">
+			<!-- Header goes here -->
+			<h1 class="page-header">
+				{{ title }}
+            </h1>
+			<!-- Bread crumbs: use 'active' CSS class for current page -->
+            <ol class="breadcrumb">
+				<li>
+					<a href="/index">Home Page</a>
+                </li>
+                <li class="active">
+					{{ title }}
+                </li>
+            </ol>
+
+            {% for message in form.errors %}
+                <div class="alert alert-warning alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <div class="panel panel-default">
+				<div class="panel-heading">Please Enter Your Payment Details</div>
+				<div class="panel-body">
+					<form action="{{ url_for('createpayment') }}" method=post>
+						{{ form.hidden_tag() }}
+
+						<!-- Row 1 -->
+						<div class="row">
+							<div class="col-md-4">
+								{{ form.receiver.label }}
+                                {{ inputField(form.receiver, "") }}
+							</div>
+						</div>
+
+						<!-- Row 2 -->
+						<div class="row" style="margin-top: 10px;">
+							<div class="col-md-4">
+								{{ form.amount.label }}
+                                {% if form.amount.errors|length > 0 %}
+                                    <div class="form-group input-group has-error">
+                                        <span class="input-group-addon">$</span>{{ form.amount(class_="form-control", id_="inputError1", placeholder="0.00") }}
+                                    </div>
+                                {% else %}
+                                    <div class="form-group input-group">
+                                        <span class="input-group-addon">$</span>{{ form.amount(class_="form-control", placeholder="0.00") }}
+                                    </div>
+                                {% endif %}
+							</div>
+                            <div class="col-md-4">
+								{{ form.date.label }}
+                                {% if form.date.errors|length > 0 %}
+                                    <div class="form-group has-error">
+                                        {{ form.date(class_="form-control", type="date", id_="inputError1", value=today, disabled="true") }}
+                                    </div>
+                                {% else %}
+                                    {{ form.date(class_="form-control", type="date", value=today, disabled="true") }}
+                                {% endif %}
+							</div>
+						</div>
+
+						<!-- Row 4 -->
+						<div class="row" style="margin-top: 10px;">
+							<div class="col-md-4">
+								<input class="btn btn-default" type="submit" value="Submit Payment!">
+							</div>
+						</div>
+					</form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

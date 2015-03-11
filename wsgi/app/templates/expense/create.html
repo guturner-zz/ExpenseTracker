@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+		<div class="col-lg-12">
+			<!-- Header goes here -->
+			<h1 class="page-header">
+				{{ title }}
+            </h1>
+			<!-- Bread crumbs: use 'active' CSS class for current page -->
+            <ol class="breadcrumb">
+				<li>
+					<a href="/index">Home Page</a>
+                </li>
+                <li class="active">
+					{{ title }}
+                </li>
+            </ol>
+
+            {% for message in form.errors %}
+                <div class="alert alert-warning alert-dismissable" id="expense_add_warning">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <div class="panel panel-default">
+				<div class="panel-heading">Please Enter Your Expense Details</div>
+				<div class="panel-body">
+					<form action="{{ url_for('createexpense') }}" method=post>
+						{{ form.hidden_tag() }}
+
+						<!-- Row 1 -->
+						<div class="row">
+							<div class="col-md-4">
+								{{ form.name.label }}
+                                {{ inputField(form.name, "") }}
+							</div>
+						</div>
+
+						<!-- Row 2 -->
+						<div class="row" style="margin-top: 10px;">
+							<div class="col-md-4">
+								{{ form.amount.label }}
+                                {% if form.amount.errors|length > 0 %}
+                                    <div class="form-group input-group has-error">
+                                        <span class="input-group-addon">$</span>{{ form.amount(class_="form-control", id_="inputError1", placeholder="0.00") }}
+                                    </div>
+                                {% else %}
+                                    <div class="form-group input-group">
+                                        <span class="input-group-addon">$</span>{{ form.amount(class_="form-control", placeholder="0.00") }}
+                                    </div>
+                                {% endif %}
+							</div>
+                            <div class="col-md-4">
+								{{ form.date.label }}
+                                {% if form.date.errors|length > 0 %}
+                                    <div class="form-group has-error">
+                                        {{ form.date(class_="form-control", min="2000-01-01", type="date", id_="inputError1", value=today, placeholder="yyyy-mm-dd") }}
+                                    </div>
+                                {% else %}
+                                    {{ form.date(class_="form-control", min="2000-01-01", type="date", value=today, placeholder="yyyy-mm-dd") }}
+                                {% endif %}
+							</div>
+						</div>
+
+                        <!-- Row 3 -->
+						<div class="row">
+							<div class="col-md-4">
+                                <input type="button" id="auto_split_button" value="Auto-Split Amount" onclick="autoSplit()"/>
+                            </div>
+                        </div>
+
+                        <!-- Row 4 -->
+						<div class="row" style="margin-top: 10px;">
+							<div class="col-md-6">
+								Participants <br>
+                                <table class="table table-bordered">
+                                {% for participant in form.participant %}
+                                    <tr>
+                                        <td>{{ householdMemberNames[loop.index - 1] }}</td>
+                                        <td><center>{{ participant.checkBox(onclick="toggleVisible('" ~ (loop.index - 1) ~ "')") }}</center></td>
+                                        <td width="50%">{{ participant.amount(class="hidden", placeholder="0.00") }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </table>
+							</div>
+						</div>
+
+						<!-- Row 4 -->
+						<div class="row" style="margin-top: 10px;">
+							<div class="col-md-4">
+								<input class="btn btn-default" id="submit_expense_btn" type="submit" value="Submit Expense!">
+							</div>
+						</div>
+					</form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = uncheckBoxes()
+
+        function uncheckBoxes() {
+            var checkboxes = new Array();
+
+            var i = 0;
+            while (document.getElementById("participant-" + i + "-checkBox")) {
+                checkboxes[checkboxes.length] = document.getElementById("participant-" + i + "-checkBox");
+                i++;
+            }
+
+            for (i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = false;
+                toggleVisible(i);
+            }
+        }
+
+        function toggleVisible(id) {
+            var checkBox = document.getElementById("participant-" + id + "-checkBox");
+            var input    = document.getElementById("participant-" + id + "-amount");
+            if (checkBox.checked) {
+                input.className = "visible";
+            } else {
+                input.value = "";
+                input.className = "hidden";
+            }
+        }
+
+        function round(value, decimals) {
+            return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Automatically evenly splits the expense amount by the number of participants
+        function autoSplit() {
+            console.log(document.getElementById("amount").value);
+            //Don't do anything if there is no expense amount to split
+            if (document.getElementById("amount").value === "") {
+                return
+            }
+
+            //Don't attempt to split negative numbers, return an error
+            if (document.getElementById("amount").value < 0) {
+                document.getElementById("amount").value = "Expense amounts must be positive.";
+                return
+            }
+
+            var i = 0;
+            var checkBoxes = [];
+            var numCheckedBoxes = 0;
+            var checkBox;
+            var expenseAmount = round(parseFloat(document.getElementById("amount").value), 2);
+            var expenseAmountInt = parseInt(expenseAmount * 100);
+            var leftOverCents = 0;
+
+            //push all checkboxes to checkBoxes and find how many are checked
+            while (document.getElementById("participant-"+String(i)+"-checkBox")) {
+                checkBox = document.getElementById("participant-"+String(i)+"-checkBox");
+                if (checkBox.checked) {
+                    numCheckedBoxes++;
+                }
+                checkBoxes.push(checkBox);
+                i++;
+            }
+
+            //Find the number of cents which can not be split evenly and subtract them from expenseAmount
+            leftOverCents = expenseAmountInt % numCheckedBoxes;
+            expenseAmount -= leftOverCents/100;
+
+            //create array to track who receives the extra cents 0 for no extra cents and 1 for an extra cent
+            var extraCents = [];
+            var extraCentParticipant;
+            for (i = 0; i < checkBoxes.length; i++) {
+                extraCents.push(0);
+            }
+
+            //chooses who gets the extra cents
+            while (leftOverCents > 0) {
+                extraCentParticipant = getRandomInt(0, checkBoxes.length - 1);
+                if (extraCents[extraCentParticipant] == 0 && checkBoxes[extraCentParticipant].checked) {
+                    extraCents[extraCentParticipant] = 1;
+                    leftOverCents--;
+                }
+            }
+
+            //update all amount.value plus the extra cents
+            for (i = 0; i < checkBoxes.length; i++) {
+                checkboxIdNumber = checkBoxes[i].id.slice(12,13);
+                if (checkBoxes[i].checked) {
+                    amount = document.getElementById("participant-"+checkboxIdNumber+"-amount");
+                    if (extraCents[i] == 1) {
+                        amount.value = round((expenseAmount / numCheckedBoxes) + 0.01, 2);
+                    }
+                    else {
+                        amount.value = round(expenseAmount / numCheckedBoxes, 2);
+                    }
+                }
+            }
+        }
+    </script>
+{% endblock %}

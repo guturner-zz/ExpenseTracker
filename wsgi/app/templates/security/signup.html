@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+		<div class="col-lg-12">
+			<!-- Header goes here -->
+			<h1 class="page-header">
+				{{ title }}
+            </h1>
+			<!-- Bread crumbs: use 'active' CSS class for current page -->
+            <ol class="breadcrumb">
+				<li>
+					<a href="/index">Home Page</a>
+                </li>
+                <li class="active">
+					{{ title }}
+                </li>
+            </ol>
+
+            {% for message in form.errors %}
+                <div class="alert alert-warning alert-dismissable" id="signup_warn">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <form action="{{ url_for('signup') }}" method=post>
+			    {{ form.hidden_tag() }}
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Step 1 of 2: Please Enter Your Information</div>
+                    <div class="panel-body">
+                        <!-- Row 1 -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.firstName.label }}
+
+                                {% if form.firstName.errors|length > 0 %}
+                                    <div class="form-group has-error">
+                                        {{ form.firstName(class_="form-control", id_="inputError1") }}
+                                    </div>
+                                {% else %}
+                                    {{ form.firstName(class_="form-control", id="first_name_txt") }}
+                                {% endif %}
+
+
+                                <div style="margin-top: 10px;">
+                                    {{ form.lastName.label }}
+                                    {{ form.lastName(class_="form-control", id="last_name_txt") }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.email.label }}
+
+                                {% if form.email.errors|length > 0 %}
+                                    <div class="form-group has-error">
+                                        {{ form.email(class_="form-control", id_="inputError1") }}
+                                    </div>
+                                {% else %}
+                                    {{ form.email(class_="form-control", id="email_txt") }}
+                                {% endif %}
+
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.pwd.label }}
+
+                                {% if form.pwd.errors|length > 0 %}
+                                    <div class="form-group has-error">
+                                        {{ form.pwd(class_="form-control", id_="inputError1") }}
+                                    </div>
+                                {% else %}
+                                    {{ form.pwd(class_="form-control", id="password_txt") }}
+                                {% endif %}
+
+                                <div style="margin-top: 10px;">
+                                    {{ form.confirmPwd.label }}
+
+                                    {% if form.confirmPwd.errors|length > 0 %}
+                                        <div class="form-group has-error">
+                                            {{ form.confirmPwd(class_="form-control", id_="inputError1") }}
+                                        </div>
+                                    {% else %}
+                                        {{ form.confirmPwd(class_="form-control", id="confirm_password_txt") }}
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Step 2 of 2: Join a <a data-toggle="tooltip" data-placement="right" title="Households are groups of users that share expenses.">Household</a></div>
+                    <div class="panel-body">
+                        <!-- Row 1 -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="lead">
+                                    Join an existing household! <i data-toggle="tooltip" data-placement="right" title="Ask a member in your household to provide you with their 32-character association key." class="fa fa-question-circle"></i>
+                                </p>
+                                {{ form.key.label }}<br>
+                                {{ form.key(placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", style="width: 300px;", id="household_key_txt") }}
+                            </div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="row" style="margin-top: 25px;">
+                            <div class="col-md-8">
+                                <p class="lead">
+                                    Or create one from scratch by entering a household nickname below!
+                                </p>
+                                {{ form.householdName.label }}<br>
+                                {{ form.householdName(style="width: 300px;", id="household_name_txt") }}
+                            </div>
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div class="row" style="margin-top: 5px;">
+                            <div class="col-md-12">
+                                <center><input class="btn btn-default" type="submit" value="Signup!" id="signup_btn"></center>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+			</form>
+        </div>
+    </div>
+
+    <script>
+        jQuery(function($){
+           $("#key").mask("********-****-****-****-************");
+        });
+    </script>
+{% endblock %}

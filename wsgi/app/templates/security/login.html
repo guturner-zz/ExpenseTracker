@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+		<div class="col-lg-12">
+			<!-- Header goes here -->
+			<h1 class="page-header">
+				{{ title }}
+            </h1>
+			<!-- Bread crumbs: use 'active' CSS class for current page -->
+            <ol class="breadcrumb">
+				<li>
+					<a href="/index">Home Page</a>
+                </li>
+                <li class="active">
+					{{ title }}
+                </li>
+            </ol>
+			
+			{% if submitted %}
+                {% for message in form.email.errors %}
+                    <div class="alert alert-warning alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+
+                {% for message in form.password.errors %}
+                    <div class="alert alert-warning alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+			{% endif %}
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">Please Enter Your Credentials</div>
+				<div class="panel-body">
+					<form action="{{ url_for('login') }}" method=post>
+						{{ form.hidden_tag() }}
+			 
+						<!-- Row 1 -->
+						<div class="row">
+							<div class="col-md-4">
+								{{ form.email.label }}
+								{% if form.email.errors|length > 0 %}
+                                    <div class="form-group has-error">
+									    {{ form.email(class_="form-control", id="inputError1") }}
+                                    </div>
+								{% else %}
+									{{ form.email(class_="form-control") }}
+								{% endif %}
+							</div>
+						</div>
+			 
+						<!-- Row 2 -->
+						<div class="row" style="margin-top: 10px;">
+							<div class="col-md-4">
+								{{ form.password.label }}
+								{% if form.password.errors|length > 0 %}
+                                    <div class="form-group has-error">
+									    {{ form.password(class_="form-control", id_="inputError1") }}
+                                    </div>
+								{% else %}
+									{{ form.password(class_="form-control") }}
+								{% endif %}
+							</div>
+						</div>
+						
+						<!-- Row 3 -->
+						<div class="row" style="margin-top: 10px;">
+							<div class="col-md-4">
+								<input class="btn btn-default" id="login_submit_btn" type="submit" value="Login!">
+							</div>
+						</div>
+					</form>
+					
+					<!-- Row 4 -->
+					<div class="row">
+						<div class="col-md-4">
+							<form action="{{ url_for('signup') }}" method=get>
+								Don't have an account? <input class="btn btn-default" type="submit" value="Signup!">
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+        </div>
+    </div>
+{% endblock %}

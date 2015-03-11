@@ -1,0 +1,268 @@
+<html>
+    <head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+        <title>Flask Expense Tracker: {{ title }}</title>
+		
+		<!-- Bootstrap Core CSS -->
+		<link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+		<!-- MetisMenu CSS -->
+		<link href="{{ url_for('static', filename='css/plugins/metisMenu/metisMenu.min.css') }}" rel="stylesheet">
+
+		<!-- Timeline CSS -->
+		<link href="{{ url_for('static', filename='css/plugins/timeline.css') }}" rel="stylesheet">
+
+		<!-- Custom CSS -->
+		<link href="{{ url_for('static', filename='css/sb-admin-2.css') }}" rel="stylesheet">
+
+		<!-- Morris Charts CSS -->
+		<link href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css" rel="stylesheet">
+
+		<!-- Custom Fonts -->
+		<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+        <!-- jQuery -->
+		<script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+
+		<!-- Bootstrap Core JavaScript -->
+		<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+		<!-- Metis Menu Plugin JavaScript -->
+		<script src="{{ url_for('static', filename='js/plugins/metisMenu/metisMenu.min.js') }}"></script>
+
+		<!-- Morris Charts JavaScript -->
+		<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+		<!-- Custom Theme JavaScript -->
+		<script src="{{ url_for('static', filename='js/sb-admin-2.js') }}"></script>
+
+        <!-- Moment.js Timestamp Library -->
+        {{ moment.include_moment() }}
+
+        <!-- Input Field Mask JavaScript -->
+        <script src="{{ url_for('static', filename='js/maskedinput.js') }}"></script>
+
+        <!-- Modal Popup JavaScript -->
+        <script src="{{ url_for('static', filename='js/bootbox.min.js') }}"></script>
+
+        <!-- Custom Expense Tracker JavaScript -->
+        <script src="{{ url_for('static', filename='js/expensetracker.js') }}"></script>
+
+        <!-- Configure Bootstrap APIs -->
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("body").popover({ selector: '[data-toggle=popover]', container: 'body' });
+            });
+
+            $(document).ready(function() {
+                $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+            });
+        </script>
+	
+    </head>
+    <body>
+        <div id="wrapper">
+		
+			<!-- Navigation -->
+			<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+				
+				<!-- Brand / Title (plus mobile navigation support) -->
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="/index">Flask Expense Tracker</a>
+				</div>
+				<!-- /.navbar-header -->
+
+				<!-- Top-Right Menu Items -->
+				<ul class="nav navbar-top-links navbar-right">
+					{% if 'email' in session %}
+
+                        <!-- Messages -->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                {% if session['unread']|length > 0 %}
+                                <i class="fa fa-envelope" style="color: orange;"></i> <b class="caret" style="color: orange;"></b>
+                                {% else %}
+                                <i class="fa fa-envelope"></i> <b class="caret"></b>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu message-dropdown">
+                                <li class="message-preview">
+                                    {% for msg in session['unread'] %}
+                                    <a href="{{ url_for('markMsgStatus', mid=msg['id']) }}">
+                                        <div class="media">
+                                            <div class="media-body">
+                                                <h5 class="media-heading"><strong>{{ msg['from'] }}</strong>
+                                                </h5>
+                                                <p class="small text-muted"><i class="fa fa-clock-o"></i> {{ moment(msg['time'], local=True).calendar() }}</p>
+                                                <p>{{ msg['memo'][0:25] }} {% if msg['memo']|length > 25 %} ... {% endif %}</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% endfor %}
+                                </li>
+                                <li class="message-footer">
+                                    <a href="/messaging/hub">Go To Message Hub</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- User Dropdown -->
+						<li class="dropdown">
+							<a class="dropdown-toggle" id="username_dd" data-toggle="dropdown" href="#">
+								{{ session['email'] }} <i class="fa fa-caret-down"></i>
+							</a>
+							<ul class="dropdown-menu dropdown-user">
+								<li>
+									<a href="/security/logout" id="logout_btn">log out</a>
+								</li>
+							</ul>
+							<!-- /.dropdown-user -->
+						</li>
+						<!-- /.dropdown -->
+					{% else %}
+						<li class="dropdown">
+							<a class="dropdown-toggle" id="welcome_dd" data-toggle="dropdown" href="#">
+								welcome <i class="fa fa-caret-down"></i>
+							</a>
+							<ul class="dropdown-menu dropdown-user">
+								<li>
+									<a href="/security/login" id="login_btn">login</a>
+								</li>
+								<li>
+									<a href="/security/signup">create account</a>
+								</li>
+							</ul>
+							<!-- /.dropdown-user -->
+						</li>
+						<!-- /.dropdown -->
+					{% endif %}
+				</ul>
+				<!-- /.navbar-top-links -->
+
+				<!-- Sidebar Links -->
+				<div class="navbar-default sidebar" role="navigation">
+					<div class="sidebar-nav navbar-collapse">
+						<ul class="nav" id="side-menu">
+                            <li>
+                                <a href="#" id="expense_dd">Expenses<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        {% if title == "Create Expense" %}
+                                        <a class="active" id="create_expense_btn"
+                                        {% else %}
+                                        <a id="create_expense_btn"
+                                        {% endif %}
+                                        href="/expense/create"><i class="fa fa-fw fa-calculator"></i> Create Expense</a>
+                                    </li>
+
+                                    <li>
+                                        {% if title == "View Expenses" %}
+                                        <a class="active"
+                                        {% else %}
+                                        <a
+                                        {% endif %}
+                                        href="/expense/view"><i class="fa fa-fw fa-table"></i> View Expenses</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <a href="#">Payments<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        {% if title == "Make Payment" %}
+                                        <a class="active"
+                                        {% else %}
+                                        <a
+                                        {% endif %}
+                                        href="/payment/create"><i class="fa fa-usd" style="margin-left: 5px; margin-right: 5px;"></i> Make Payment</a>
+                                    </li>
+
+                                    <li>
+                                        {% if title == "View Payments" %}
+                                        <a class="active"
+                                        {% else %}
+                                        <a
+                                        {% endif %}
+                                        href="/payment/view"><i class="fa fa-fw fa-table"></i> View Payments</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                {% if title.startswith("Household") %}
+                                <a class="active" id="household_btn"
+                                {% else %}
+                                <a id="household_btn"
+                                {% endif %}
+                                href="/user/household"><i class="fa fa-exchange"></i>  View Household</a>
+                            </li>
+
+                            <li>
+                                {% if title == "Messaging Hub" %}
+                                <a class="active"
+                                {% else %}
+                                <a
+                                {% endif %}
+                                href="/messaging/hub"><i class="fa fa-envelope"></i>  Messaging Hub</a>
+                            </li>
+						</ul>
+					</div>
+					<!-- /.sidebar-collapse -->
+				</div>
+				<!-- /.navbar-static-side -->
+			</nav>
+			
+			<div id="page-wrapper">
+				<div class="container-fluid">
+					<div class="row" style="margin-top: 5px;">
+						{% if "new" in session %}
+							<div class="alert alert-success alert-dismissable" onload="{{ session.pop('new', None) }}">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+								<strong>Hey, {{session["firstName"]}}!</strong> Let's track some expenses!
+							</div>
+						{% endif %}
+						
+						{% if "login" in session %}
+							<div class="alert alert-success alert-dismissable" onload="{{ session.pop('login', None) }}">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+								<strong>Welcome back, {{session["firstName"]}}!</strong>
+							</div>
+						{% endif %}
+					</div>
+
+                    <!-- Global Macros -->
+                    {% macro inputField(form, placeholderText) %}
+                        {% if form.errors|length > 0 %}
+                            <div class="form-group has-error" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+                                {{ form(class_="form-control", id_="inputError1", placeholder=placeholderText) }}
+                            </div>
+                        {% else %}
+                            {{ form(class_="form-control", placeholder=placeholderText) }}
+                        {% endif %}
+                    {% endmacro %}
+
+					<!-- main area -->
+					{% block content %}{% endblock %}
+					
+				</div>
+			</div>
+		</div>
+    </body>
+</html>

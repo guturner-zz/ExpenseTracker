@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+		<div class="col-lg-12">
+			<!-- Header goes here -->
+			<h1 class="page-header">
+				{{ title }}
+            </h1>
+			<!-- Bread crumbs: use 'active' CSS class for current page -->
+            <ol class="breadcrumb">
+				<li>
+					<a href="/index">Home Page</a>
+                </li>
+                <li>
+					<a href="/messaging/hub">Messaging Hub</a>
+                </li>
+                <li class="active">
+					{{ title }}
+                </li>
+            </ol>
+
+            {% for message in form.to.errors %}
+                <div class="alert alert-warning alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% for message in form.memo.errors %}
+                <div class="alert alert-warning alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <form action="{{ url_for('sendMsg', uid=user.ID) }}" method=post>
+                {{ form.hidden_tag() }}
+
+                <div>
+                    {{ form.to.label }} {{ form.to() }}
+                </div>
+
+                <div style="margin-top: 10px;">
+                    {{ form.memo.label }}
+                    <br>{{ form.memo(cols="50", rows="5") }}
+                </div>
+
+                <br><input type="submit" value="Send Message!">
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

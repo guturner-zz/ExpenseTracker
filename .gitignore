@@ -1,0 +1,8 @@
+*.pyc
+*.pyo
+.idea/
+.idea/*
+*~
+desktop.ini
+*.py.orig
+config.py

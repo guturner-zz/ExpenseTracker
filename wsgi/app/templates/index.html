@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+        <h1 class="page-header">Shared Costs? <small>Manage them easily and efficiently with Flask Expense Tracker!</small></h1>
+    </div>
+	<div class="row">
+        {% if 'email' not in session %}
+            <p class="lead" id="no_account_msg">
+                Don't have an account?
+                <a href="/security/signup" class="btn btn-lg btn-default" id="create_account_btn">Get Started »</a>
+            </p>
+        {% else %}
+            <h2>Quick Links</h2>
+            <a href="/expense/create" class="btn btn-lg btn-default">Create Expense »</a>
+            <a href="/payment/create" class="btn btn-lg btn-default">Make Payment »</a>
+        {% endif %}
+	</div>
+{% endblock %}
